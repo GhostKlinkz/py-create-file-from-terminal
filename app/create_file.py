@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 
 
-def main():
+def main() -> None:
     args = sys.argv[1:]
 
     directories = []
@@ -24,28 +24,28 @@ def main():
     if directories:
         os.makedirs(directory, exist_ok=True)
 
-    filepath = os.path.join(directory, filename)
+    if filename:
+        filepath = os.path.join(directory, filename)
 
-    lines = []
+        lines = []
 
-    while True:
-        line = input("Enter content line: ")
+        while True:
+            line = input("Enter content line: ")
 
-        if line == "stop":
-            break
+            if line == "stop":
+                break
 
-        lines.append(line)
+            lines.append(f"{len(lines) + 1} {line}")
 
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    with open(filepath, "a") as file:
-        if os.path.getsize(filepath) > 0:
-            file.write("\n")
+        with open(filepath, "a") as file:
+            if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
+                file.write("\n")
 
-        file.write(f"{timestamp}\n")
-
-        for number, line in enumerate(lines, start=1):
-            file.write(f"{number} {line}\n")
+            file.write(f"{timestamp}\n")
+            if lines:
+                file.write("\n".join(lines) + "\n")
 
 
 if __name__ == "__main__":
