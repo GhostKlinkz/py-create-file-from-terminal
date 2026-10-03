@@ -1,6 +1,6 @@
+from datetime import datetime
 import os
 import sys
-from datetime import datetime
 
 
 def create_file() -> None:
@@ -13,21 +13,22 @@ def create_file() -> None:
     while i < len(args):
         if args[i] == "-d":
             i += 1
-
-            while i < len(args) and args[i] != "-f":
+            while i < len(args) and not args[i].startswith("-"):
                 directories.append(args[i])
                 i += 1
+            # Не делаем здесь continue/i+=1, так как i уже указывает на следующий флаг или конец
+            continue
 
         elif args[i] == "-f":
             i += 1
-
             if i < len(args):
                 filename = args[i]
+                i += 1
+            continue
 
         i += 1
 
     directory = os.path.join(*directories) if directories else "."
-
     os.makedirs(directory, exist_ok=True)
 
     if not filename:
@@ -56,4 +57,3 @@ def create_file() -> None:
 
 if __name__ == "__main__":
     create_file()
-```
