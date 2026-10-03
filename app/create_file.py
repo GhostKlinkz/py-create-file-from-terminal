@@ -1,52 +1,61 @@
+from datetime import datetime
 import os
 import sys
-from datetime import datetime
 
 
-def main() -> None:
-    args = sys.argv[1:]
-
+def create_file() -> None:
     directories = []
     filename = None
 
-    if "-d" in args:
-        d_index = args.index("-d")
-        end_index = args.index("-f") if "-f" in args else len(args)
-        directories = args[d_index + 1:end_index]
+    args = sys.argv[1:]
+    i = 0
 
-    if "-f" in args:
-        f_index = args.index("-f")
-        if f_index + 1 < len(args):
-            filename = args[f_index + 1]
+    while i < len(args):
+        if args[i] == "-d":
+            i += 1
+            while (
+                i < len(args)
+                and not args[i].startswith("-")
+            ):
+                directories.append(args[i])
+                i += 1
+            continue
+
+        elif args[i] == "-f":
+            i += 1
+            if i < len(args):
+                filename = args[i]
+                i += 1
+            continue
+
+        i += 1
 
     directory = os.path.join(*directories) if directories else "."
+    os.makedirs(directory, exist_ok=True)
 
-    if directories:
-        os.makedirs(directory, exist_ok=True)
+    if not filename:
+        return
 
-    if filename:
-        filepath = os.path.join(directory, filename)
+    filepath = os.path.join(directory, filename)
 
-        lines = []
+    lines = []
+    number = 1
 
-        while True:
-            line = input("Enter content line: ")
+    while True:
+        line = input("Enter content line: ")
 
-            if line == "stop":
-                break
+        if line == "stop":
+            break
 
-            lines.append(f"{len(lines) + 1} {line}")
+        lines.append(f"{number} {line}")
+        number += 1
 
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        with open(filepath, "a") as file:
-            if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
-                file.write("\n")
-
-            file.write(f"{timestamp}\n")
-            if lines:
-                file.write("\n".join(lines) + "\n")
+    with open(filepath, "a") as file:
+        file.write(f"{timestamp}\n")
+        file.write("\n".join(lines) + "\n")
 
 
 if __name__ == "__main__":
-    main()
+    create_file()
