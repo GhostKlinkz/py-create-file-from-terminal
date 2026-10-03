@@ -13,10 +13,12 @@ def create_file() -> None:
     while i < len(args):
         if args[i] == "-d":
             i += 1
-            while i < len(args) and not args[i].startswith("-"):
+            while (
+                i < len(args)
+                and not args[i].startswith("-")
+            ):
                 directories.append(args[i])
                 i += 1
-            # Не делаем здесь continue/i+=1, так как i уже указывает на следующий флаг или конец
             continue
 
         elif args[i] == "-f":
