@@ -3,63 +3,42 @@ import sys
 from datetime import datetime
 
 
-def parse_args(args: list) -> tuple:
-    dir_parts = []
-    file_names = []
-    current_flag = None
+def create_file() -> None:
+    args = sys.argv[1:]
+    directories = []
+    file_name = None
 
-    for arg in args:
-        if arg in ("-d", "-f"):
-            current_flag = arg
-        elif current_flag == "-d":
-            dir_parts.append(arg)
-        elif current_flag == "-f":
-            file_names.append(arg)
+    if "-d" in args:
+        d_index = args.index("-d")
+        end = len(args)
+        if "-f" in args and args.index("-f") > d_index:
+            end = args.index("-f")
+        directories = args[d_index + 1:end]
 
-    file_name = file_names[0] if file_names else None
-    return dir_parts, file_name
+    if "-f" in args:
+        file_name = args[args.index("-f") + 1]
 
+    path = os.path.join(*directories) if directories else ""
+    if directories:
+        os.makedirs(path, exist_ok=True)
 
-def read_content() -> list:
-    lines = []
+    if file_name is None:
+        return
+
+    file_path = os.path.join(path, file_name)
+
+    lines = [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+    number = 1
     while True:
         line = input("Enter content line: ")
         if line == "stop":
             break
-        lines.append(line)
-    return lines
+        lines.append(f"{number} {line}")
+        number += 1
 
-
-def write_to_file(file_path: str, lines: list) -> None:
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    already_has_content = (
-        os.path.exists(file_path) and os.path.getsize(file_path) > 0
-    )
-
+    separator = "\n" if os.path.exists(file_path) else ""
     with open(file_path, "a") as file:
-        if already_has_content:
-            file.write("\n")
-        file.write(timestamp + "\n")
-        for number, line in enumerate(lines, start=1):
-            file.write(f"{number} {line}\n")
-
-
-def create_file() -> None:
-    dir_parts, file_name = parse_args(sys.argv[1:])
-
-    if not dir_parts and file_name is None:
-        print("Usage: python create_file.py [-d dir1 dir2 ...] [-f file_name]")
-        return
-
-    path = ""
-    if dir_parts:
-        path = os.path.join(*dir_parts)
-        os.makedirs(path, exist_ok=True)
-
-    if file_name is not None:
-        file_path = os.path.join(path, file_name)
-        lines = read_content()
-        write_to_file(file_path, lines)
+        file.write(separator + "\n".join(lines) + "\n")
 
 
 if __name__ == "__main__":
