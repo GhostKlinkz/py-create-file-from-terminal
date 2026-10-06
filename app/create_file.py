@@ -41,5 +41,4 @@ def create_file() -> None:
         file.write(separator + "\n".join(lines) + "\n")
 
 
-if __name__ == "__main__":
-    create_file()
+create_file()
